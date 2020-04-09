@@ -1,4 +1,4 @@
-context("naive Bayes")
+context("naive Bayes - naivebayes")
 
 # ------------------------------------------------------------------------------
 
@@ -16,16 +16,16 @@ in_samp <- sample.int(nrow(Glass), 5)
 Glass$factor <- factor(sample(letters[1:3], nrow(Glass), replace = TRUE))
 
 glass_tr <- Glass[-in_samp,]
-glass_te <- Glass[ in_samp, -10]
+glass_te <- Glass[ in_samp, -7]
 glass_na <- glass_te
 glass_na$RI[1] <- NA
 glass_na$Na[2] <- NA
 
 x_tr <- model.matrix(Type ~ ., data = glass_tr)[, -1]
-x_te <- model.matrix(Type ~ ., data = glass_te)[, -1]
+x_te <- model.matrix( ~ ., data = glass_te)[, -1]
 opt <- getOption("na.action")
 options(na.action = "na.pass")
-x_na <- model.matrix(Type ~ ., data = glass_na,)[, -1]
+x_na <- model.matrix( ~ ., data = glass_na,)[, -1]
 options(na.action = opt)
 
 ind_data <- as.data.frame(x_tr)
@@ -44,15 +44,19 @@ probs_to_tibble <- function(x) {
 
 # ------------------------------------------------------------------------------
 
-nb_spec   <- naive_Bayes(smoothness = 1.2) %>% set_engine("klaR")
-prior_spec <- naive_Bayes() %>% set_engine("klaR", prior = rep(1/6, 6))
+nb_spec   <- naive_Bayes(smoothness = 1.2) %>% set_engine("naivebayes")
+prior_spec <- naive_Bayes() %>% set_engine("naivebayes", prior = rep(1/6, 6))
 
-exp_f_fit     <- klaR::NaiveBayes(Type ~ ., data = ind_data,
-                                  usekernel = TRUE, adjust = 1.2)
-exp_xy_fit    <- klaR::NaiveBayes(x = glass_tr[,-10], grouping = glass_tr$Type,
-                                  usekernel = TRUE, adjust = 1.2)
-exp_prior_fit <- klaR::NaiveBayes(x = glass_tr[,-10], grouping = glass_tr$Type,
-                                  prior = rep(1/6, 6), usekernel = TRUE)
+
+exp_f_fit     <- naivebayes::naive_bayes(Type ~ ., data = ind_data,
+                                         usekernel = TRUE, adjust = 1.2)
+
+exp_xy_fit    <- naivebayes::naive_bayes(x = glass_tr[,-7], y = glass_tr$Type,
+                                         usekernel = TRUE, adjust = 1.2)
+
+exp_prior_fit <- naivebayes::naive_bayes(x = glass_tr[,-7], y = glass_tr$Type,
+                                         prior = rep(1/6, 6), usekernel = TRUE)
+
 
 # ------------------------------------------------------------------------------
 
@@ -72,7 +76,7 @@ test_that('model object', {
 
   # x/y method
   expect_error(
-    xy_fit <- fit_xy(nb_spec, x = glass_tr[,-10], y = glass_tr$Type),
+    xy_fit <- fit_xy(nb_spec, x = glass_tr[,-7], y = glass_tr$Type),
     NA
   )
   for (x in names(xy_fit$fit$tables)) {
@@ -89,7 +93,7 @@ test_that('model object', {
   }
 
   # pass an extra argument
-  expect_error(prior_fit <- fit_xy(prior_spec, x = glass_tr[,-10], y = glass_tr$Type), NA)
+  expect_error(prior_fit <- fit_xy(prior_spec, x = glass_tr[,-7], y = glass_tr$Type), NA)
   for (x in names(prior_fit$fit$tables)) {
     x_dat <- prior_fit$fit$tables[[x]]
 
@@ -99,7 +103,7 @@ test_that('model object', {
         expect_equal(x_dat[[val]]$y, exp_prior_fit$tables[[x]][[val]]$y)
       }
     } else {
-      expect_equal(x_dat, exp_prior_fit$tables[[x]])
+      expect_equal(x_dat, exp_prior_fit$tables[[x]], check.attributes = FALSE)
     }
   }
 
@@ -116,11 +120,11 @@ test_that('class predictions', {
 
   expect_true(inherits(f_pred, "tbl_df"))
   expect_true(all(names(f_pred) == ".pred_class"))
-  expect_equivalent(f_pred$.pred_class, exp_f_pred$class)
+  expect_equivalent(f_pred$.pred_class, exp_f_pred)
 
   # x/y method
   expect_error(
-    xy_fit <- fit_xy(nb_spec, x = glass_tr[,-10], y = glass_tr$Type),
+    xy_fit <- fit_xy(nb_spec, x = glass_tr[,-7], y = glass_tr$Type),
     NA
   )
   xy_pred <- predict(xy_fit, glass_te)
@@ -128,16 +132,16 @@ test_that('class predictions', {
 
   expect_true(inherits(xy_pred, "tbl_df"))
   expect_true(all(names(xy_pred) == ".pred_class"))
-  expect_equivalent(xy_pred$.pred_class, exp_xy_pred$class)
+  expect_equivalent(xy_pred$.pred_class, exp_xy_pred)
 
   # added argument
-  expect_error(prior_fit <- fit_xy(prior_spec, x = glass_tr[,-10], y = glass_tr$Type), NA)
+  expect_error(prior_fit <- fit_xy(prior_spec, x = glass_tr[,-7], y = glass_tr$Type), NA)
   prior_pred <- predict(prior_fit, glass_te)
   exp_prior_pred <- predict(exp_prior_fit, glass_te)
 
   expect_true(inherits(f_pred, "tbl_df"))
   expect_true(all(names(f_pred) == ".pred_class"))
-  expect_equivalent(prior_pred$.pred_class, exp_prior_pred$class)
+  expect_equivalent(prior_pred$.pred_class, exp_prior_pred)
 })
 
 # ------------------------------------------------------------------------------
@@ -147,7 +151,7 @@ test_that('prob predictions', {
   # formula method
   expect_error(f_fit <- fit(nb_spec, Type ~ ., data = glass_tr), NA)
   f_pred <- predict(f_fit, glass_te, type = "prob")
-  exp_f_pred <- probs_to_tibble(predict(exp_f_fit, x_te)$posterior)
+  exp_f_pred <- probs_to_tibble(predict(exp_f_fit, x_te, type = "prob"))
 
   expect_true(inherits(f_pred, "tbl_df"))
   expect_equal(names(f_pred), prob_names)
@@ -155,20 +159,20 @@ test_that('prob predictions', {
 
   # x/y method
   expect_error(
-    xy_fit <- fit_xy(nb_spec, x = glass_tr[,-10], y = glass_tr$Type),
+    xy_fit <- fit_xy(nb_spec, x = glass_tr[,-7], y = glass_tr$Type),
     NA
   )
   xy_pred <- predict(xy_fit, glass_te, type = "prob")
-  exp_xy_pred <- probs_to_tibble(predict(exp_xy_fit, glass_te)$posterior)
+  exp_xy_pred <- probs_to_tibble(predict(exp_xy_fit, glass_te, type = "prob"))
 
   expect_true(inherits(xy_pred, "tbl_df"))
   expect_equal(names(xy_pred), prob_names)
   expect_equal(xy_pred, exp_xy_pred)
 
   # added argument
-  expect_error(prior_fit <- fit_xy(prior_spec, x = glass_tr[,-10], y = glass_tr$Type), NA)
+  expect_error(prior_fit <- fit_xy(prior_spec, x = glass_tr[,-7], y = glass_tr$Type), NA)
   prior_pred <- predict(prior_fit, glass_te, type = "prob")
-  exp_prior_pred <- probs_to_tibble(predict(exp_prior_fit, glass_te)$posterior)
+  exp_prior_pred <- probs_to_tibble(predict(exp_prior_fit, glass_te, type = "prob"))
 
   expect_true(inherits(prior_pred, "tbl_df"))
   expect_equal(names(prior_pred), prob_names)
@@ -181,7 +185,7 @@ test_that('prob predictions', {
 test_that('missing data', {
   expect_error(f_fit <- fit(nb_spec, Type ~ ., data = glass_tr), NA)
   f_pred <- predict(f_fit, glass_na, type = "prob")
-  exp_f_pred <- probs_to_tibble(predict(exp_f_fit, x_na)$posterior)
+  exp_f_pred <- probs_to_tibble(predict(exp_f_fit, x_na, type = "prob"))
 
   expect_true(inherits(f_pred, "tbl_df"))
   expect_true(nrow(f_pred) == nrow(glass_te))
@@ -194,7 +198,7 @@ test_that('missing data', {
 test_that('api errors', {
   expect_error(
     naive_Bayes() %>% set_engine("lda"),
-    regexp = "Engine 'lda' is not available"
+    "Engine 'lda' is not available"
   )
 })
 
@@ -206,19 +210,5 @@ test_that('printing', {
     print(nb_spec),
     "Naive Bayes Model Specification"
   )
-})
-
-# ------------------------------------------------------------------------------
-
-test_that('updating', {
-  nb_spec_2 <- naive_Bayes(smoothness = .1) %>% set_engine("klaR")
-  nb_spec_3 <- update(nb_spec, smoothness = .1)
-  expect_equal(nb_spec_2, nb_spec_3)
-
-  prior_spec_2 <- naive_Bayes(smoothness = .1) %>%
-    set_engine("klaR", prior = rep(1/6, 6))
-  prior_spec_3 <- update(prior_spec, smoothness = .1)
-  expect_equal(prior_spec_2, prior_spec_3)
-
 })
 
