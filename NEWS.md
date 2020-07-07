@@ -1,3 +1,7 @@
+# discrim 0.1.0
+
+ * Small updates to work with new `parsnip` version.
+
 # discrim 0.0.2
 
 * Added `naivebayes` engine for `naive_Bayes()` (#5).
