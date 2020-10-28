@@ -18,6 +18,7 @@ make_discrim_linear_MASS <- function() {
 
   parsnip::set_model_engine("discrim_linear", "classification", "MASS")
   parsnip::set_dependency("discrim_linear", "MASS", "MASS")
+  parsnip::set_dependency("discrim_linear", "MASS", "discrim")
 
   parsnip::set_fit(
     model = "discrim_linear",
@@ -38,7 +39,8 @@ make_discrim_linear_MASS <- function() {
     options = list(
       predictor_indicators = "traditional",
       compute_intercept = TRUE,
-      remove_intercept = TRUE
+      remove_intercept = TRUE,
+      allow_sparse_x = FALSE
     )
   )
 
@@ -101,6 +103,7 @@ make_discrim_linear_mda <- function() {
 
   parsnip::set_model_engine("discrim_linear", "classification", "mda")
   parsnip::set_dependency("discrim_linear", eng = "mda", pkg = "mda")
+  parsnip::set_dependency("discrim_linear", eng = "mda", pkg = "discrim")
 
   parsnip::set_model_arg(
     model = "discrim_linear",
@@ -130,7 +133,8 @@ make_discrim_linear_mda <- function() {
     options = list(
       predictor_indicators = "traditional",
       compute_intercept = TRUE,
-      remove_intercept = TRUE
+      remove_intercept = TRUE,
+      allow_sparse_x = FALSE
     )
   )
 
