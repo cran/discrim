@@ -59,10 +59,18 @@ underlying model functions. If parameters need to be modified, \code{update()}
 can be used in lieu of recreating the object from scratch.
 
 For \code{discrim_regularized()}, the mode will always be "classification".
+
+Some special cases for the RDA model:
+\itemize{
+\item \code{frac_identity = 0} and \code{frac_common_cov = 1} is a linear
+discriminant analysis (LDA) model.
+\item \code{frac_identity = 0} and \code{frac_common_cov = 0} is a quadratic
+discriminant analysis (QDA) model.
+}
 }
 \section{Engine Details}{
 Engines may have pre-set default arguments when executing the model fit
-call. For this type of model, the template of the fit calls are:\if{html}{\out{<div class="r">}}\preformatted{discrim_regularized() \%>\% 
+call. For this type of model, the template of the fit calls are:\if{html}{\out{<div class="sourceCode r">}}\preformatted{discrim_regularized() \%>\% 
   set_engine("klaR") \%>\% 
   translate()
 }\if{html}{\out{</div>}}\preformatted{## Regularized Discriminant Model Specification (classification)
