@@ -1,4 +1,6 @@
-# discrim (development version)
+# discrim 0.2.0
+
+* Model definition functions (e.g. `discrim_linear()`) were moved to the parsnip package.
 
 # discrim 0.1.3
 
