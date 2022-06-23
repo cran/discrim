@@ -1,3 +1,7 @@
+# discrim 1.0.0
+
+* Case weights were enabled for [discrim_flexible()] and [discrim_linear()] (`"mda"` engine).
+
 # discrim 0.2.0
 
 * Model definition functions (e.g. `discrim_linear()`) were moved to the parsnip package.
