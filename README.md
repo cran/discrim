@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# discrim
+# discrim <a href="https://discrim.tidymodels.org/"><img src="man/figures/logo.png" align="right" height="138" alt="discrim website" /></a>
 
 <!-- badges: start -->
 
@@ -12,6 +12,8 @@ coverage](https://codecov.io/gh/tidymodels/discrim/branch/main/graph/badge.svg)]
 [![R-CMD-check](https://github.com/tidymodels/discrim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidymodels/discrim/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+[![Codecov test
+coverage](https://codecov.io/gh/tidymodels/discrim/graph/badge.svg)](https://app.codecov.io/gh/tidymodels/discrim)
 <!-- badges: end -->
 
 `discrim` contains simple bindings to enable the `parsnip` package to
@@ -71,9 +73,9 @@ parabolic_grid <-
               X2 = seq(-5, 5, length = 100))
 
 fda_mod <-
-  discrim_flexible(num_terms = 3) %>%
+  discrim_flexible(num_terms = 3) |>
   # increase `num_terms` to find smoother boundaries
-  set_engine("earth") %>%
+  set_engine("earth") |>
   fit(class ~ ., data = parabolic)
 
 parabolic_grid$fda <-
@@ -98,7 +100,7 @@ By contributing to this project, you agree to abide by its terms.
 
 - For questions and discussions about tidymodels packages, modeling, and
   machine learning, please [post on RStudio
-  Community](https://community.rstudio.com/new-topic?category_id=15&tags=tidymodels,question).
+  Community](https://forum.posit.co/new-topic?category_id=15&tags=tidymodels,question).
 
 - If you think you have encountered a bug, please [submit an
   issue](https://github.com/tidymodels/discrim/issues).

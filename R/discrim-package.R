@@ -12,5 +12,10 @@
 
 ## usethis namespace: start
 #' @importFrom stats predict
+#' @importFrom parsnip set_new_model
 ## usethis namespace: end
 NULL
+
+# Global vars ------------------------------------------------------------------
+
+utils::globalVariables(c("x", "y"))

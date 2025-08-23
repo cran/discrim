@@ -3,7 +3,7 @@
 # they are already in the parsnip model database. We'll exclude them from
 # coverage stats for this reason.
 
-# nocov
+# nocov start
 make_discrim_flexible <- function() {
   parsnip::set_model_engine("discrim_flexible", "classification", "earth")
   parsnip::set_dependency("discrim_flexible", eng = "earth", pkg = "mda")
@@ -68,11 +68,10 @@ make_discrim_flexible <- function() {
       pre = NULL,
       post = NULL,
       func = c(pkg = "discrim", fun = "pred_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          new_data = quote(new_data)
-        )
+      args = list(
+        object = quote(object$fit),
+        new_data = quote(new_data)
+      )
     )
   )
 
@@ -85,12 +84,11 @@ make_discrim_flexible <- function() {
       pre = NULL,
       post = prob_matrix_to_tibble,
       func = c(pkg = "discrim", fun = "pred_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          new_data = quote(new_data),
-          type = "posterior"
-        )
+      args = list(
+        object = quote(object$fit),
+        new_data = quote(new_data),
+        type = "posterior"
+      )
     )
   )
 
@@ -103,11 +101,10 @@ make_discrim_flexible <- function() {
       pre = NULL,
       post = NULL,
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data)
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data)
+      )
     )
   )
 }

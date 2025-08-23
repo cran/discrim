@@ -31,18 +31,18 @@ theme_set(theme_bw())
 data(parabolic, package = "modeldata")
 }\if{html}{\out{</div>}}
 
-To create the model, the \code{\link[=discrim_flexible]{discrim_flexible()}}
-function is used along with an engine of \code{"earth"} (which contains the
-methods to use the MARS model). We’ll set the number of MARS terms to
-use but this can be tuned via the methods in the tune package.
+To create the model, the \code{discrim_flexible()} function is used along
+with an engine of \code{"earth"} (which contains the methods to use the MARS
+model). We’ll set the number of MARS terms to use but this can be tuned
+via the methods in the tune package.
 
 The \code{fit()} function estimates the model. \code{fit_xy()} can be used if one
 does not wish to use the formula method.
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{fda_mod <-
-  discrim_flexible(num_terms = 3) \%>\%
+  discrim_flexible(num_terms = 3) |>
   # increase `num_terms` to find smoother boundaries
-  set_engine("earth") \%>\%
+  set_engine("earth") |>
   fit(class ~ ., data = parabolic)
 fda_mod
 }\if{html}{\out{</div>}}
@@ -70,7 +70,7 @@ creating a contour plot for the 50\% probability cutoff.
               X2 = seq(-5, 5, length = 100))
 
 parabolic_grid <- 
-  parabolic_grid \%>\% 
+  parabolic_grid |> 
   bind_cols(
     predict(fda_mod, parabolic_grid, type = "prob")
   )
@@ -101,7 +101,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Posit Software, PBC [copyright holder, funder]
+  \item Posit Software, PBC (03wc8by49) [copyright holder, funder]
 }
 
 }
